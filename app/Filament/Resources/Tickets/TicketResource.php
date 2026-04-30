@@ -49,6 +49,22 @@ class TicketResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (auth()->user()->role === 'Técnico') {
+            $query->where('user_id', auth()->id());
+        }
+
+        return $query;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()->role === 'Administrador';
+    }
+
     public static function getPages(): array
     {
         return [

@@ -20,13 +20,19 @@ class ClienteResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Gestión Comercial';
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->role === 'Administrador';
+    }
+
     protected static ?string $navigationLabel = 'Clientes';
 
     protected static ?string $modelLabel = 'Cliente';
 
     protected static ?string $pluralModelLabel = 'Clientes';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Gestión de Clientes';
 
     protected static ?int $navigationSort = 1;
 

@@ -16,4 +16,21 @@ class TicketObserver
         // Enviamos el ticket a la cola para no trabar al usuario
         ClassifyTicketWithGemini::dispatch($ticket);
     }
+
+    /**
+     * Handle the Ticket "updated" event.
+     */
+    public function updated(Ticket $ticket): void
+    {
+        // Si el ticket se marcó como Resuelto y tiene coordenadas
+        if ($ticket->estado === 'Resuelto' && $ticket->latitud_capturada && $ticket->longitud_capturada) {
+            $cliente = $ticket->cliente;
+            if ($cliente) {
+                // Actualizamos las coordenadas maestras del cliente
+                $cliente->latitud = $ticket->latitud_capturada;
+                $cliente->longitud = $ticket->longitud_capturada;
+                $cliente->saveQuietly();
+            }
+        }
+    }
 }

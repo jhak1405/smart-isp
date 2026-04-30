@@ -16,6 +16,10 @@ class Ticket extends Model
         'ia_prioridad',
         'ia_categoria',
         'ia_resumen',
+        'nota_tecnico',
+        'evidencia',
+        'latitud_capturada',
+        'longitud_capturada',
     ];
 
     public function cliente(): BelongsTo
