@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Tickets\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class TicketForm
@@ -52,10 +53,35 @@ class TicketForm
                     ->default('Abierto')
                     ->native(false),
 
-                // Campos IA ocultos
-                // TextInput::make('ia_prioridad'),
-                // TextInput::make('ia_categoria'),
-                // Textarea::make('ia_resumen'),
+                // -------------------------------------------------------
+                // Clasificación de IA (Solo lectura)
+                // -------------------------------------------------------
+                Section::make('Clasificación de Inteligencia Artificial')
+                    ->description('Estos campos son generados automáticamente por el motor de IA (Gemini). No se pueden editar manualmente.')
+                    ->icon('heroicon-o-sparkles')
+                    ->columns(2)
+                    ->collapsed()
+                    ->schema([
+                        TextInput::make('ia_prioridad')
+                            ->label('Prioridad (IA)')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->placeholder('Pendiente de análisis'),
+
+                        TextInput::make('ia_categoria')
+                            ->label('Categoría (IA)')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->placeholder('Pendiente de análisis'),
+
+                        Textarea::make('ia_resumen')
+                            ->label('Resumen (IA)')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->rows(3)
+                            ->placeholder('El resumen generado por la IA aparecerá aquí.')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

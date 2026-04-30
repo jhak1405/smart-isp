@@ -49,6 +49,29 @@ class TicketsTable
                         default      => 'gray',
                     }),
 
+                TextColumn::make('ia_prioridad')
+                    ->label('Prioridad IA')
+                    ->badge()
+                    ->color(fn(?string $state): string => match ($state) {
+                        'Alta'  => 'danger',
+                        'Media' => 'warning',
+                        'Baja'  => 'success',
+                        default => 'gray',
+                    })
+                    ->placeholder('—'),
+
+                TextColumn::make('ia_categoria')
+                    ->label('Categoría IA')
+                    ->searchable()
+                    ->placeholder('—')
+                    ->toggleable(),
+
+                TextColumn::make('ia_resumen')
+                    ->label('Resumen IA')
+                    ->limit(40)
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('created_at')
                     ->label('Creado')
                     ->dateTime('d/m/Y H:i')
