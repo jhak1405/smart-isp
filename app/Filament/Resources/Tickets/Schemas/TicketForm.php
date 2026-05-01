@@ -118,6 +118,7 @@ class TicketForm
                         FileUpload::make('evidencia')
                             ->label('Evidencia Fotográfica')
                             ->image()
+                            ->disk('public')
                             ->directory('evidencias-tickets')
                             ->columnSpanFull(),
 

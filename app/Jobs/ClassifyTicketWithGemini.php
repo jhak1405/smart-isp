@@ -49,6 +49,9 @@ class ClassifyTicketWithGemini implements ShouldQueue
                             ],
                         ],
                     ],
+                    'generationConfig' => [
+                        'response_mime_type' => 'application/json',
+                    ],
                 ]
             );
 
