@@ -1,51 +1,63 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Técnicos - Smart ISP</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
     <style>
         :root {
-            --primary: #8b5cf6; /* Purple */
-            --primary-hover: #7c3aed;
-            --bg-color: #0f172a; /* Deep Slate */
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
+            /* Brand Colors - Professional Blue */
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            
+            /* Grays & Backgrounds */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            
+            /* Text */
+            --text-main: #0f172a;
+            --text-secondary: #475569;
             --text-muted: #94a3b8;
-            --accent-success: #10b981;
-            --accent-warning: #f59e0b;
+            
+            /* Status Accents */
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --danger: #ef4444;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-body);
             color: var(--text-main);
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.1), transparent 25%);
-            background-attachment: fixed;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Header */
         header {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
             padding: 1rem 1.5rem;
             position: sticky;
             top: 0;
@@ -53,122 +65,187 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: var(--shadow-sm);
         }
 
         .header-title {
-            font-weight: 600;
-            font-size: 1.2rem;
-            background: linear-gradient(to right, #c084fc, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-title svg {
+            color: var(--primary);
+            width: 24px;
+            height: 24px;
         }
 
         .logout-btn {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .logout-btn:hover {
-            color: #ef4444;
+            color: var(--danger);
         }
 
         /* Container */
         .container {
-            padding: 1.5rem;
+            padding: 2rem 1.25rem;
             max-width: 800px;
             margin: 0 auto;
             padding-bottom: 100px;
         }
 
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.5rem;
         }
 
-        /* Glass Cards */
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .ticket-count {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Cards */
         .ticket-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
             position: relative;
-            overflow: hidden;
         }
 
-        .ticket-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--primary);
+        .ticket-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
         }
 
-        .ticket-card.en-proceso::before {
-            background: var(--accent-warning);
+        .ticket-card.en-proceso {
+            border-left: 4px solid var(--warning);
+        }
+
+        .ticket-card.abierto {
+            border-left: 4px solid var(--primary);
         }
 
         .ticket-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .ticket-title {
-            font-size: 1.1rem;
+            font-size: 1.125rem;
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.35rem;
+            line-height: 1.4;
         }
 
         .ticket-client {
             font-size: 0.9rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
+        .ticket-client svg {
+            color: var(--text-muted);
+        }
+
+        /* Badges */
         .badge {
             font-size: 0.75rem;
             font-weight: 600;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
         }
 
-        .badge.abierto { background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
-        .badge.proceso { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge.abierto { background: var(--primary-light); color: var(--primary); }
+        .badge.proceso { background: var(--warning-bg); color: #d97706; }
 
         .ticket-desc {
             font-size: 0.95rem;
-            color: #cbd5e1;
-            margin-bottom: 1rem;
-            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #f1f5f9;
         }
 
         .ia-box {
-            background: rgba(0, 0, 0, 0.2);
+            background: #f8fafc;
             border-radius: 8px;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border: 1px dashed rgba(139, 92, 246, 0.3);
-            font-size: 0.85rem;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .ia-icon {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ia-content {
+            flex: 1;
         }
         
-        .ia-box strong { color: #c084fc; }
+        .ia-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .ia-summary {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
 
         /* Buttons */
         .btn {
@@ -176,90 +253,98 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 0.875rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-decoration: none;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            background-color: var(--primary);
             color: white;
-            box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.39);
+            border: 1px solid var(--primary-hover);
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-primary:hover {
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.23);
-            transform: translateY(-1px);
+            background-color: var(--primary-hover);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, var(--accent-success), #059669);
+            background-color: var(--success);
             color: white;
-            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+            border: 1px solid #059669;
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-success:hover {
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.23);
-            transform: translateY(-1px);
+            background-color: #059669;
         }
 
         .btn-outline {
-            background: transparent;
-            border: 1px solid var(--glass-border);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
             color: var(--text-main);
+            box-shadow: var(--shadow-sm);
         }
 
-        /* Modal / Resolution Form */
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Forms */
         .resolution-form {
             display: none;
-            animation: slideDown 0.3s ease-out forwards;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--glass-border);
+            animation: fadeIn 0.3s ease-out forwards;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
         }
 
         .form-label {
             display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.875rem;
+            font-weight: 600;
             margin-bottom: 0.5rem;
-            color: var(--text-muted);
+            color: var(--text-main);
         }
 
         .form-control {
             width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--glass-border);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 0.75rem;
-            color: white;
-            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            resize: vertical;
         }
 
         .form-control:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         /* Custom File Input */
         .file-upload {
             position: relative;
-            display: inline-block;
+            display: block;
             width: 100%;
         }
 
@@ -271,97 +356,158 @@
             width: 100%;
             height: 100%;
             cursor: pointer;
+            z-index: 10;
         }
 
         .file-upload-label {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 1rem;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px dashed var(--primary);
+            gap: 8px;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
             border-radius: 8px;
-            color: var(--primary);
+            color: var(--text-secondary);
             font-weight: 500;
-            text-align: center;
-            transition: all 0.3s;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .file-upload-label svg {
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
         }
 
         .file-upload:hover .file-upload-label {
-            background: rgba(139, 92, 246, 0.2);
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .file-upload:hover .file-upload-label svg {
+            color: var(--primary);
         }
 
-        /* Map Container */
+        /* Map */
         .map-container {
-            height: 200px;
+            height: 220px;
             width: 100%;
             border-radius: 8px;
             overflow: hidden;
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--border-color);
             margin-bottom: 0.5rem;
+            z-index: 1;
         }
 
         .gps-status {
-            font-size: 0.8rem;
-            color: var(--accent-warning);
+            font-size: 0.85rem;
+            color: var(--warning);
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            font-weight: 500;
+            padding: 8px 12px;
+            background: var(--warning-bg);
+            border-radius: 6px;
         }
 
         .gps-status.locked {
-            color: var(--accent-success);
+            color: #059669;
+            background: var(--success-bg);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            color: #cbd5e1;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.125rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
         }
 
         /* Alerts */
         .alert {
-            padding: 1rem;
+            padding: 1rem 1.25rem;
             border-radius: 8px;
             margin-bottom: 1.5rem;
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #34d399;
+            background: var(--success-bg);
+            border: 1px solid #a7f3d0;
+            color: #065f46;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-title">Smart ISP - Técnicos</div>
+        <div class="header-title">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Smart ISP Tech
+        </div>
         <form method="POST" action="/admin/logout" style="display:inline;">
             @csrf
-            <button type="submit" class="logout-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;">Cerrar sesión</button>
+            <button type="submit" class="logout-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;">
+                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Salir
+            </button>
         </form>
     </header>
 
     <div class="container">
-        <h1 class="page-title">Tus Tickets Asignados</h1>
+        <div class="page-header">
+            <h1 class="page-title">Tickets Asignados</h1>
+            <span class="ticket-count">{{ $tickets->count() }} {{ $tickets->count() == 1 ? 'Pendiente' : 'Pendientes' }}</span>
+        </div>
 
         @if(session('success'))
             <div class="alert">
+                <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 {{ session('success') }}
             </div>
         @endif
 
         @if($tickets->isEmpty())
-            <div style="text-align:center; padding: 3rem 1rem; color: var(--text-muted);">
-                <svg style="width:64px;height:64px;margin:0 auto 1rem;opacity:0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                <p>¡Buen trabajo! No tienes tickets pendientes.</p>
+            <div class="empty-state">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <h3>Estás al día</h3>
+                <p>No tienes tickets pendientes en tu bandeja por ahora.</p>
             </div>
         @else
             @foreach($tickets as $ticket)
-                <div class="ticket-card {{ $ticket->estado == 'En Proceso' ? 'en-proceso' : '' }}">
+                <div class="ticket-card {{ $ticket->estado == 'En Proceso' ? 'en-proceso' : 'abierto' }}">
                     <div class="ticket-header">
                         <div>
                             <h2 class="ticket-title">#{{ $ticket->id }} - {{ $ticket->titulo }}</h2>
                             <div class="ticket-client">
-                                <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 {{ $ticket->cliente ? $ticket->cliente->nombre_completo : 'Cliente Desconocido' }}
                                 @if($ticket->cliente && $ticket->cliente->direccion_escrita)
-                                    | {{ $ticket->cliente->direccion_escrita }}
+                                    • {{ $ticket->cliente->direccion_escrita }}
                                 @endif
                             </div>
                         </div>
@@ -374,18 +520,32 @@
 
                     @if($ticket->ia_resumen || $ticket->ia_categoria)
                         <div class="ia-box">
-                            <strong>IA:</strong> {{ $ticket->ia_categoria }} - {{ $ticket->ia_prioridad }}<br>
-                            <em>{{ $ticket->ia_resumen }}</em>
+                            <div class="ia-icon">
+                                <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <div class="ia-content">
+                                <div class="ia-title">
+                                    <span>Análisis IA: {{ $ticket->ia_categoria }}</span>
+                                    <span style="color: {{ $ticket->ia_prioridad == 'Alta' ? 'var(--danger)' : ($ticket->ia_prioridad == 'Media' ? 'var(--warning)' : 'var(--success)') }}">
+                                        Prioridad {{ $ticket->ia_prioridad }}
+                                    </span>
+                                </div>
+                                <div class="ia-summary">{{ $ticket->ia_resumen }}</div>
+                            </div>
                         </div>
                     @endif
 
                     @if($ticket->estado === 'Abierto')
                         <form action="{{ route('tecnico.ticket.status', $ticket->id) }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-outline">Iniciar Trabajo</button>
+                            <button type="submit" class="btn btn-outline">
+                                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Iniciar Trabajo
+                            </button>
                         </form>
                     @elseif($ticket->estado === 'En Proceso')
                         <button type="button" class="btn btn-primary" onclick="toggleResolveForm({{ $ticket->id }})">
+                            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             Resolver Ticket
                         </button>
 
@@ -398,31 +558,31 @@
                                     <label class="form-label">Evidencia Fotográfica *</label>
                                     <div class="file-upload">
                                         <div class="file-upload-label" id="file-label-{{ $ticket->id }}">
-                                            <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                            Tomar Foto o Subir Archivo
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                            <span>Pulsa para tomar foto o elegir archivo</span>
                                         </div>
                                         <input type="file" name="evidencia" accept="image/*" capture="environment" required onchange="updateFileName(this, {{ $ticket->id }})">
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Nota del Técnico (Opcional)</label>
-                                    <textarea name="nota_tecnico" class="form-control" rows="2" placeholder="Describe brevemente la solución..."></textarea>
+                                    <label class="form-label">Nota del Trabajo (Opcional)</label>
+                                    <textarea name="nota_tecnico" class="form-control" rows="3" placeholder="Describe brevemente la solución aplicada..."></textarea>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Tu Ubicación (GPS) *</label>
+                                    <label class="form-label">Ubicación GPS *</label>
                                     <div id="map-{{ $ticket->id }}" class="map-container"></div>
                                     <div id="gps-status-{{ $ticket->id }}" class="gps-status">
                                         <svg style="width:16px;height:16px;animation: spin 2s linear infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                        Buscando señal GPS...
+                                        Buscando señal GPS para validar trabajo...
                                     </div>
                                     <input type="hidden" name="latitud" id="lat-{{ $ticket->id }}" required>
                                     <input type="hidden" name="longitud" id="lng-{{ $ticket->id }}" required>
                                 </div>
 
                                 <button type="submit" class="btn btn-success" id="submit-btn-{{ $ticket->id }}" disabled>
-                                    Completar y Resolver
+                                    Completar y Guardar
                                 </button>
                             </form>
                         </div>
@@ -455,11 +615,11 @@
             const label = document.getElementById('file-label-' + ticketId);
             if (input.files && input.files.length > 0) {
                 label.innerHTML = `
-                    <svg style="width:24px;height:24px;color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    Imagen lista (${(input.files[0].size / 1024 / 1024).toFixed(2)} MB)
+                    <svg style="width:32px;height:32px;color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span style="color:#059669;font-weight:600;">Evidencia lista (${(input.files[0].size / 1024 / 1024).toFixed(2)} MB)</span>
                 `;
                 label.style.borderColor = '#10b981';
-                label.style.background = 'rgba(16, 185, 129, 0.1)';
+                label.style.background = '#ecfdf5';
             }
         }
 
@@ -479,7 +639,6 @@
 
             let marker = null;
 
-            // Obtener ubicación GPS real
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const lat = position.coords.latitude;
@@ -491,30 +650,27 @@
                     if (marker) map.removeLayer(marker);
                     
                     marker = L.marker([lat, lng]).addTo(map)
-                        .bindPopup("Tu ubicación actual (Precisión: " + Math.round(accuracy) + "m)").openPopup();
+                        .bindPopup("Ubicación exacta de trabajo").openPopup();
                     
-                    L.circle([lat, lng], { radius: accuracy, color: '#8b5cf6', fillOpacity: 0.1 }).addTo(map);
+                    L.circle([lat, lng], { radius: accuracy, color: '#2563eb', fillOpacity: 0.1 }).addTo(map);
 
-                    // Guardar en inputs ocultos
                     document.getElementById('lat-' + ticketId).value = lat;
                     document.getElementById('lng-' + ticketId).value = lng;
 
-                    // Actualizar UI
                     const statusEl = document.getElementById('gps-status-' + ticketId);
                     statusEl.className = 'gps-status locked';
                     statusEl.innerHTML = `
                         <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Ubicación fijada con éxito
+                        Coordenadas validadas correctamente
                     `;
 
-                    // Habilitar botón de submit
                     document.getElementById('submit-btn-' + ticketId).disabled = false;
 
                 }, function(error) {
                     const statusEl = document.getElementById('gps-status-' + ticketId);
                     statusEl.innerHTML = `
                         <svg style="width:16px;height:16px;color:#ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        <span style="color:#ef4444;">Error al obtener GPS. Asegúrate de dar permisos de ubicación.</span>
+                        <span style="color:#ef4444;">No se pudo verificar tu ubicación. Permite el uso del GPS en el navegador.</span>
                     `;
                 }, {
                     enableHighAccuracy: true,
@@ -522,7 +678,7 @@
                     maximumAge: 0
                 });
             } else {
-                document.getElementById('gps-status-' + ticketId).innerHTML = "Tu navegador no soporta geolocalización.";
+                document.getElementById('gps-status-' + ticketId).innerHTML = "Navegador incompatible con GPS.";
             }
         }
 
@@ -531,11 +687,11 @@
             const lng = document.getElementById('lng-' + ticketId).value;
             
             if (!lat || !lng) {
-                alert('Es necesario capturar la ubicación GPS para resolver el ticket.');
+                alert('Es un requisito indispensable registrar tus coordenadas GPS para validar la resolución.');
                 return false;
             }
             
-            document.getElementById('submit-btn-' + ticketId).innerHTML = 'Guardando...';
+            document.getElementById('submit-btn-' + ticketId).innerHTML = 'Procesando y Guardando...';
             document.getElementById('submit-btn-' + ticketId).disabled = true;
             return true;
         }
