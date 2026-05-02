@@ -25,9 +25,8 @@ class UserForm
                 TextInput::make('password')
                     ->label('Contraseña')
                     ->password()
-                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                     ->dehydrated(fn ($state) => filled($state))
-                    ->required(fn (string $context): bool => $context === 'create')
+                    ->required(fn (string $operation): bool => $operation === 'create')
                     ->maxLength(255),
                 Select::make('role')
                     ->label('Rol del Sistema')
