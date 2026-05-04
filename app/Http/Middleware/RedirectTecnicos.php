@@ -17,6 +17,11 @@ class RedirectTecnicos
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->role === 'Técnico') {
+            // Permitir que el técnico ejecute la ruta de cerrar sesión sin ser redirigido
+            if ($request->is('*/logout') || $request->routeIs('filament.*.auth.logout')) {
+                return $next($request);
+            }
+
             return redirect('/tecnico');
         }
 
