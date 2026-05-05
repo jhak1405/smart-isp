@@ -7,7 +7,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TicketResolved extends Notification
+class TicketAssigned extends Notification
 {
 
     public Ticket $ticket;
@@ -25,10 +25,10 @@ class TicketResolved extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Ticket resuelto')
-            ->line('El ticket "' . $this->ticket->titulo . '" ha sido resuelto.')
+            ->subject('Nuevo ticket asignado')
+            ->line('Se te ha asignado un nuevo ticket: ' . $this->ticket->titulo)
             ->action('Ver Ticket', url('/admin/tickets/' . $this->ticket->id . '/edit'))
-            ->line('Gracias!');
+            ->line('Gracias por tu trabajo!');
     }
 
     public function toDatabase(object $notifiable): array
@@ -36,10 +36,10 @@ class TicketResolved extends Notification
         return [
             'format' => 'filament',
             'duration' => 'persistent',
-            'title' => 'Ticket resuelto',
-            'body' => 'El ticket "' . $this->ticket->titulo . '" ha sido resuelto.',
+            'title' => 'Nuevo ticket asignado',
+            'body' => 'Se te ha asignado el ticket: ' . $this->ticket->titulo,
             'ticket_id' => $this->ticket->id,
-            'mensaje' => 'El ticket ha sido resuelto.',
+            'mensaje' => 'Se te ha asignado un nuevo ticket.',
         ];
     }
 
@@ -47,10 +47,10 @@ class TicketResolved extends Notification
     {
         return new BroadcastMessage([
             'format' => 'filament',
-            'title' => 'Ticket resuelto',
-            'body' => 'El ticket "' . $this->ticket->titulo . '" ha sido resuelto.',
+            'title' => 'Nuevo ticket asignado',
+            'body' => 'Se te ha asignado el ticket: ' . $this->ticket->titulo,
             'ticket_id' => $this->ticket->id,
-            'mensaje' => 'El ticket ha sido resuelto.',
+            'mensaje' => 'Se te ha asignado un nuevo ticket.',
         ]);
     }
 }

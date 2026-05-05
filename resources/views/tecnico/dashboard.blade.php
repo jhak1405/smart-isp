@@ -3,36 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Portal de Técnicos - Smart ISP</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            /* Brand Colors - Professional Blue */
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
             --primary-light: #eff6ff;
-            
-            /* Grays & Backgrounds */
             --bg-body: #f8fafc;
             --bg-card: #ffffff;
             --border-color: #e2e8f0;
-            
+
             /* Text */
             --text-main: #0f172a;
             --text-secondary: #475569;
             --text-muted: #94a3b8;
-            
+
             /* Status Accents */
             --success: #10b981;
             --success-bg: #ecfdf5;
             --warning: #f59e0b;
             --warning-bg: #fffbeb;
             --danger: #ef4444;
-            
+
             /* Shadows */
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -231,7 +229,7 @@
         .ia-content {
             flex: 1;
         }
-        
+
         .ia-title {
             font-size: 0.85rem;
             font-weight: 600;
@@ -386,7 +384,7 @@
             border-color: var(--primary);
             color: var(--primary);
         }
-        
+
         .file-upload:hover .file-upload-label svg {
             color: var(--primary);
         }
@@ -435,7 +433,7 @@
             margin: 0 auto 1rem;
             color: #cbd5e1;
         }
-        
+
         .empty-state h3 {
             font-size: 1.125rem;
             color: var(--text-main);
@@ -469,13 +467,16 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             Smart ISP Tech
         </div>
-        <form method="POST" action="/admin/logout" style="display:inline;">
-            @csrf
-            <button type="submit" class="logout-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;">
-                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                Salir
-            </button>
-        </form>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            @include('components.notification-bell')
+            <form method="POST" action="/admin/logout" style="display:inline;">
+                @csrf
+                <button type="submit" class="logout-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;">
+                    <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Salir
+                </button>
+            </form>
+        </div>
     </header>
 
     <div class="container">
@@ -484,10 +485,46 @@
             <span class="ticket-count">{{ $tickets->count() }} {{ $tickets->count() == 1 ? 'Pendiente' : 'Pendientes' }}</span>
         </div>
 
+        @if($errors->any())
+            <div class="alert" style="background: #fee2e2; border: 1px solid #fecaca; color: #991b1b;">
+                <ul style="margin: 0; padding-left: 1.25rem;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @if(session('success'))
             <div class="alert">
                 <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 {{ session('success') }}
+            </div>
+        @endif
+
+        @if($notifications && $notifications->count() > 0)
+            <div style="margin-bottom: 2rem; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);">
+                <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 1.5rem; color: white;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+                        <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <h3 style="font-weight: 700; font-size: 1.1rem;">Nuevas Notificaciones</h3>
+                        <span style="background: rgba(255,255,255,0.3); padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; margin-left: auto;">{{ $notifications->count() }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        @foreach($notifications as $notification)
+                            @php
+                                $data = $notification->data;
+                                $title = $data['title'] ?? 'Nueva notificación';
+                                $body = $data['body'] ?? '';
+                            @endphp
+                            <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 8px; border-left: 3px solid rgba(255,255,255,0.5);">
+                                <div style="font-weight: 600; margin-bottom: 0.25rem;">{{ $title }}</div>
+                                <div style="font-size: 0.9rem; opacity: 0.95;">{{ $body }}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">{{ $notification->created_at->diffForHumans() }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         @endif
 
@@ -553,7 +590,7 @@
                         <div id="resolve-form-{{ $ticket->id }}" class="resolution-form">
                             <form action="{{ route('tecnico.ticket.resolver', $ticket->id) }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm({{ $ticket->id }})">
                                 @csrf
-                                
+
                                 <div class="form-group">
                                     <label class="form-label">Evidencia Fotográfica *</label>
                                     <div class="file-upload">
@@ -577,8 +614,8 @@
                                         <svg style="width:16px;height:16px;animation: spin 2s linear infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                         Buscando señal GPS para validar trabajo...
                                     </div>
-                                    <input type="hidden" name="latitud" id="lat-{{ $ticket->id }}" required>
-                                    <input type="hidden" name="longitud" id="lng-{{ $ticket->id }}" required>
+                                    <input type="hidden" name="latitud" id="lat-{{ $ticket->id }}">
+                                    <input type="hidden" name="longitud" id="lng-{{ $ticket->id }}">
                                 </div>
 
                                 <button type="submit" class="btn btn-success" id="submit-btn-{{ $ticket->id }}" disabled>
@@ -594,7 +631,7 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
+
     <script>
         // Animations
         const style = document.createElement('style');
@@ -646,12 +683,12 @@
                     const accuracy = position.coords.accuracy;
 
                     map.setView([lat, lng], 16);
-                    
+
                     if (marker) map.removeLayer(marker);
-                    
+
                     marker = L.marker([lat, lng]).addTo(map)
                         .bindPopup("Ubicación exacta de trabajo").openPopup();
-                    
+
                     L.circle([lat, lng], { radius: accuracy, color: '#2563eb', fillOpacity: 0.1 }).addTo(map);
 
                     document.getElementById('lat-' + ticketId).value = lat;
@@ -672,25 +709,29 @@
                         <svg style="width:16px;height:16px;color:#ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         <span style="color:#ef4444;">No se pudo verificar tu ubicación. Permite el uso del GPS en el navegador.</span>
                     `;
+                    // Permitir envío aun si falla la geolocalización (se recomienda usar GPS)
+                    document.getElementById('submit-btn-' + ticketId).disabled = false;
                 }, {
                     enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 0
                 });
             } else {
-                document.getElementById('gps-status-' + ticketId).innerHTML = "Navegador incompatible con GPS.";
+                const statusEl = document.getElementById('gps-status-' + ticketId);
+                statusEl.innerHTML = "Navegador incompatible con GPS. Puedes completar sin coordenadas.";
+                document.getElementById('submit-btn-' + ticketId).disabled = false;
             }
         }
 
         function validateForm(ticketId) {
             const lat = document.getElementById('lat-' + ticketId).value;
             const lng = document.getElementById('lng-' + ticketId).value;
-            
+
             if (!lat || !lng) {
                 alert('Es un requisito indispensable registrar tus coordenadas GPS para validar la resolución.');
                 return false;
             }
-            
+
             document.getElementById('submit-btn-' + ticketId).innerHTML = 'Procesando y Guardando...';
             document.getElementById('submit-btn-' + ticketId).disabled = true;
             return true;

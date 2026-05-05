@@ -3,6 +3,10 @@
 namespace App\Observers;
 
 use App\Models\Ticket;
+use App\Notifications\TicketAssigned;
+use App\Notifications\TicketResolved;
+use App\Jobs\BroadcastTicketAssigned;
+use App\Jobs\BroadcastTicketResolved;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -17,7 +21,9 @@ class TicketObserver
         try {
             $apiKey = env('GEMINI_API_KEY');
 
-            if (!$apiKey) return;
+            if (!$apiKey) {
+                return;
+            }
 
             $prompt = 'Actúa como un experto en soporte técnico de un ISP (Proveedor de Internet). Analiza esta descripción de avería: "' . $ticket->descripcion . '". Devuelve ÚNICAMENTE un JSON válido sin formato markdown ni comillas invertidas, con las siguientes tres claves exactas: "ia_categoria" (Opciones: Fibra, Router, Antena, Pagos, General), "ia_prioridad" (Opciones: Alta, Media, Baja), y "ia_resumen" (Un resumen técnico de la falla en máximo 15 palabras).';
 
@@ -40,7 +46,7 @@ class TicketObserver
             if ($response->successful()) {
                 $data = $response->json();
                 $aiText = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
-                
+
                 if ($aiText) {
                     // Limpieza por si acaso, aunque generationConfig lo garantiza
                     $cleanJson = preg_replace('/^```json|```$/m', '', $aiText);
@@ -63,11 +69,29 @@ class TicketObserver
      */
     public function updated(Ticket $ticket): void
     {
-        // Si el ticket se marcó como Resuelto y tiene coordenadas
+        // Notificar asignación (DB + Broadcast en tiempo real)
+        if ($ticket->wasChanged('user_id') && $ticket->user_id) {
+            $assignedUser = \App\Models\User::find($ticket->user_id);
+            if ($assignedUser) {
+                $assignedUser->notify(new TicketAssigned($ticket));
+                // Disparar broadcast en tiempo real vía Job
+                BroadcastTicketAssigned::dispatch($ticket, $assignedUser);
+            }
+        }
+
+        // Notificar resolución (DB + Broadcast en tiempo real)
+        if ($ticket->wasChanged('estado') && $ticket->estado === 'Resuelto') {
+            $admins = \App\Models\User::where('role', 'Administrador')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new TicketResolved($ticket));
+            }
+            // Disparar broadcast en tiempo real vía Job
+            BroadcastTicketResolved::dispatch($ticket);
+        }
+
         if ($ticket->estado === 'Resuelto' && $ticket->latitud_capturada && $ticket->longitud_capturada) {
             $cliente = $ticket->cliente;
             if ($cliente) {
-                // Actualizamos las coordenadas maestras del cliente
                 $cliente->latitud = $ticket->latitud_capturada;
                 $cliente->longitud = $ticket->longitud_capturada;
                 $cliente->saveQuietly();

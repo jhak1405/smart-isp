@@ -11,4 +11,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tecnico', [TecnicoController::class, 'dashboard'])->name('tecnico.dashboard');
     Route::post('/tecnico/ticket/{id}/status', [TecnicoController::class, 'updateStatus'])->name('tecnico.ticket.status');
     Route::post('/tecnico/ticket/{id}/resolver', [TecnicoController::class, 'resolver'])->name('tecnico.ticket.resolver');
+    Route::post('/tecnico/notifications/read', [TecnicoController::class, 'markNotificationsAsRead'])->name('tecnico.notifications.read');
 });
