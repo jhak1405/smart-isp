@@ -65,6 +65,21 @@ class TicketObserver
     }
 
     /**
+     * Handle the Ticket "created" event.
+     */
+    public function created(Ticket $ticket): void
+    {
+        // Notificar asignación inicial si ya viene con técnico
+        if ($ticket->user_id) {
+            $assignedUser = \App\Models\User::find($ticket->user_id);
+            if ($assignedUser) {
+                $assignedUser->notify(new TicketAssigned($ticket));
+                BroadcastTicketAssigned::dispatch($ticket, $assignedUser);
+            }
+        }
+    }
+
+    /**
      * Handle the Ticket "updated" event.
      */
     public function updated(Ticket $ticket): void

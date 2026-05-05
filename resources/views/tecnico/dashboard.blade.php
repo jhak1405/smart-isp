@@ -458,6 +458,7 @@
             align-items: center;
             gap: 8px;
         }
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </style>
 </head>
 <body>
@@ -499,32 +500,6 @@
             <div class="alert">
                 <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 {{ session('success') }}
-            </div>
-        @endif
-
-        @if($notifications && $notifications->count() > 0)
-            <div style="margin-bottom: 2rem; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);">
-                <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 1.5rem; color: white;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
-                        <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <h3 style="font-weight: 700; font-size: 1.1rem;">Nuevas Notificaciones</h3>
-                        <span style="background: rgba(255,255,255,0.3); padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; margin-left: auto;">{{ $notifications->count() }}</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        @foreach($notifications as $notification)
-                            @php
-                                $data = $notification->data;
-                                $title = $data['title'] ?? 'Nueva notificación';
-                                $body = $data['body'] ?? '';
-                            @endphp
-                            <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 8px; border-left: 3px solid rgba(255,255,255,0.5);">
-                                <div style="font-weight: 600; margin-bottom: 0.25rem;">{{ $title }}</div>
-                                <div style="font-size: 0.9rem; opacity: 0.95;">{{ $body }}</div>
-                                <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">{{ $notification->created_at->diffForHumans() }}</div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
             </div>
         @endif
 

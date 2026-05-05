@@ -164,27 +164,22 @@
             }).catch(err => console.error('Error:', err));
         });
 
-        // Setup Echo listener
-        if (typeof window.Echo !== 'undefined') {
-            try {
-                window.Echo.private(`user.{{ Auth::id() }}`)
-                    .listen('ticket.assigned', (e) => {
-                        const newNotif = {
-                            data: {
-                                title: 'Nuevo ticket asignado',
-                                body: e.message || 'Se te ha asignado un nuevo ticket',
-                            },
-                            created_at: new Date().toISOString(),
-                            read_at: null
-                        };
-                        notifications.unshift(newNotif);
-                        if (notifications.length > 10) notifications.pop();
+        // Setup Polling (Same as Admin logic)
+        const fetchNewNotifications = () => {
+            fetch('{{ route("tecnico.notifications.get") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        // Actualizar la lista local con los datos frescos
+                        notifications = data;
                         renderNotifications();
-                    });
-            } catch (e) {
-                console.log('Echo not ready yet');
-            }
-        }
+                    }
+                })
+                .catch(err => console.error('Error polling notifications:', err));
+        };
+
+        // Poll every 30 seconds
+        setInterval(fetchNewNotifications, 30000);
 
         // Initial render
         renderNotifications();

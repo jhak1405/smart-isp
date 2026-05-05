@@ -23,6 +23,12 @@ class TecnicoController extends Controller
         return view('tecnico.dashboard', compact('tickets', 'notifications'));
     }
 
+    public function getNotifications()
+    {
+        $notifications = Auth::user()->notifications()->whereNull('read_at')->latest()->limit(5)->get();
+        return response()->json($notifications);
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $ticket = Ticket::where('user_id', Auth::id())->findOrFail($id);
