@@ -8,6 +8,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class TicketStatsWidget extends StatsOverviewWidget
 {
+    protected static bool $isDiscovered = false;
+
     // Solo visible en la página de tickets
     public static function canView(): bool
     {

@@ -26,12 +26,11 @@ class TicketsTable
                     ->weight(FontWeight::Bold)
                     ->width('60px'),
 
-                // Título con el cliente debajo (como en la imagen)
+                // Título
                 TextColumn::make('titulo')
                     ->label('Título')
                     ->searchable()
                     ->weight(FontWeight::SemiBold)
-                    ->description(fn ($record): string => 'Solicitante: ' . ($record->cliente?->nombre_completo ?? '—'))
                     ->limit(60)
                     ->wrap(),
 
@@ -40,6 +39,12 @@ class TicketsTable
                     ->label('Categoría')
                     ->badge()
                     ->color('warning')
+                    ->placeholder('—'),
+
+                // Solicitante
+                TextColumn::make('cliente.nombre_completo')
+                    ->label('Solicitante')
+                    ->searchable()
                     ->placeholder('—'),
 
                 // Técnico Asignado (Assignee)
