@@ -17,31 +17,43 @@ class TicketsTable
     {
         return $table
             ->columns([
+                // ID compacto
                 TextColumn::make('id')
                     ->label('ID')
                     ->sortable()
-                    ->searchable(),
-
-                TextColumn::make('cliente.nombre_completo')
-                    ->label('Cliente')
                     ->searchable()
-                    ->sortable()
-                    ->weight(FontWeight::Medium),
+                    ->prefix('#')
+                    ->weight(FontWeight::Bold)
+                    ->width('60px'),
 
+                // Título con el cliente debajo (como en la imagen)
                 TextColumn::make('titulo')
                     ->label('Título')
                     ->searchable()
-                    ->limit(50),
+                    ->weight(FontWeight::SemiBold)
+                    ->description(fn ($record): string => 'Solicitante: ' . ($record->cliente?->nombre_completo ?? '—'))
+                    ->limit(60)
+                    ->wrap(),
 
+                // Categoría IA en lugar de departamento
+                TextColumn::make('ia_categoria')
+                    ->label('Categoría')
+                    ->badge()
+                    ->color('warning')
+                    ->placeholder('—'),
+
+                // Técnico Asignado (Assignee)
                 TextColumn::make('tecnico.name')
-                    ->label('Técnico Asignado')
+                    ->label('Asignado a')
                     ->searchable()
-                    ->placeholder('Sin Asignar'),
+                    ->placeholder('Sin Asignar')
+                    ->icon('heroicon-m-user-circle'),
 
+                // Estado con badge de color
                 TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'Abierto'    => 'danger',
                         'En Proceso' => 'warning',
                         'Resuelto'   => 'success',
@@ -49,10 +61,11 @@ class TicketsTable
                         default      => 'gray',
                     }),
 
+                // Prioridad IA
                 TextColumn::make('ia_prioridad')
-                    ->label('Prioridad IA')
+                    ->label('Prioridad')
                     ->badge()
-                    ->color(fn(?string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'Alta'  => 'danger',
                         'Media' => 'warning',
                         'Baja'  => 'success',
@@ -60,25 +73,14 @@ class TicketsTable
                     })
                     ->placeholder('—'),
 
-                TextColumn::make('ia_categoria')
-                    ->label('Categoría IA')
-                    ->searchable()
-                    ->placeholder('—')
-                    ->toggleable(),
-
-                TextColumn::make('ia_resumen')
-                    ->label('Resumen IA')
-                    ->limit(40)
-                    ->placeholder('—')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('created_at')
-                    ->label('Creado')
-                    ->dateTime('d/m/Y H:i')
+                // Fecha de última actividad
+                TextColumn::make('updated_at')
+                    ->label('Última Actividad')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->since(),
             ])
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('updated_at', 'desc')
             ->filters([
                 SelectFilter::make('estado')
                     ->label('Estado')
@@ -88,10 +90,22 @@ class TicketsTable
                         'Resuelto'   => 'Resuelto',
                         'Cerrado'    => 'Cerrado',
                     ]),
+
+                SelectFilter::make('ia_prioridad')
+                    ->label('Prioridad IA')
+                    ->options([
+                        'Alta'  => 'Alta',
+                        'Media' => 'Media',
+                        'Baja'  => 'Baja',
+                    ]),
+
+                SelectFilter::make('user_id')
+                    ->label('Técnico')
+                    ->relationship('tecnico', 'name'),
             ])
             ->recordActions([
-                EditAction::make(),
                 ViewAction::make(),
+                EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
