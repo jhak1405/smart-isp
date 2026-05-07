@@ -530,6 +530,34 @@
                         {{ $ticket->descripcion }}
                     </div>
 
+                    @if($ticket->notas_equipamiento)
+                        <div style="
+                            background: #fffbeb;
+                            border: 1px solid #fcd34d;
+                            border-left: 4px solid #f59e0b;
+                            border-radius: 8px;
+                            padding: 0.875rem 1rem;
+                            margin-bottom: 1.25rem;
+                            display: flex;
+                            gap: 10px;
+                            align-items: flex-start;
+                        ">
+                            <div style="flex-shrink: 0; margin-top: 2px;">
+                                <svg style="width:18px;height:18px;color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"></path>
+                                </svg>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size:0.8rem;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">
+                                    ⚠️ Equipamiento Necesario — Llevar Antes de Salir
+                                </div>
+                                <div style="font-size:0.9rem;color:#78350f;line-height:1.5;">
+                                    {{ $ticket->notas_equipamiento }}
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     @if($ticket->ia_resumen || $ticket->ia_categoria)
                         <div class="ia-box">
                             <div class="ia-icon">

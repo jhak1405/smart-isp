@@ -59,6 +59,14 @@ class TicketForm
                     ->columnSpanFull()
                     ->disabled($isTecnico),
 
+                Textarea::make('notas_equipamiento')
+                    ->label('Notas de Equipamiento')
+                    ->helperText('Indica qué materiales o herramientas deberá llevar el técnico al visitar al cliente.')
+                    ->rows(2)
+                    ->placeholder('Ej: Llevar cable RJ45 cat6, router TP-Link, escalera...')
+                    ->columnSpanFull()
+                    ->disabled($isTecnico),
+
                 Select::make('estado')
                     ->label('Estado')
                     ->required()

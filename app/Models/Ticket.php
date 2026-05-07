@@ -12,6 +12,7 @@ class Ticket extends Model
         'user_id',
         'titulo',
         'descripcion',
+        'notas_equipamiento',
         'estado',
         'ia_prioridad',
         'ia_categoria',
