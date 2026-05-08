@@ -43,19 +43,25 @@ class TecnicoController extends Controller
     {
         \Illuminate\Support\Facades\Log::info("Intentando resolver ticket ID: " . $id);
         $request->validate([
-            // Permitimos lat/long nulos para que el técnico pueda completar el ticket
-            // si el GPS no está disponible; se recomienda usar GPS pero no bloquear la acción.
             'latitud' => 'nullable|numeric',
             'longitud' => 'nullable|numeric',
-            'evidencia' => 'required|image|max:10240', // 10MB max
+            'evidencia' => 'required|image|max:10240', // Siempre requerida para el ticket
+            'foto_fachada' => 'nullable|image|max:10240', // Requerida solo si el cliente no tiene
             'nota_tecnico' => 'nullable|string'
         ]);
 
-        $ticket = Ticket::where('user_id', Auth::id())->findOrFail($id);
+        $ticket = Ticket::with('cliente')->where('user_id', Auth::id())->findOrFail($id);
 
+        // 1. Guardar la Evidencia del trabajo (PERTENECE AL TICKET)
         if ($request->hasFile('evidencia')) {
-            $path = $request->file('evidencia')->store('evidencias-tickets', 'public');
-            $ticket->evidencia = $path;
+            $pathEvidencia = $request->file('evidencia')->store('evidencias-tickets', 'public');
+            $ticket->evidencia = $pathEvidencia;
+        }
+
+        // 2. Guardar la Foto de Fachada (PERTENECE AL CLIENTE)
+        if ($request->hasFile('foto_fachada') && $ticket->cliente) {
+            $pathFachada = $request->file('foto_fachada')->store('fotos-clientes', 'public');
+            $ticket->cliente->foto_fachada = $pathFachada;
         }
 
         $ticket->estado = 'Resuelto';
@@ -63,6 +69,13 @@ class TecnicoController extends Controller
         $ticket->longitud_capturada = $request->longitud;
         $ticket->nota_tecnico = $request->nota_tecnico;
         $ticket->save();
+
+        // Actualizar coordenadas en el cliente si fueron provistas
+        if ($ticket->cliente && $request->latitud && $request->longitud) {
+            $ticket->cliente->latitud = $request->latitud;
+            $ticket->cliente->longitud = $request->longitud;
+            $ticket->cliente->save();
+        }
 
         return redirect()->route('tecnico.dashboard')->with('success', 'Ticket resuelto correctamente.');
     }

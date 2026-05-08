@@ -17,4 +17,9 @@ class ViewTicket extends ViewRecord
                 ->label('Editar Ticket'),
         ];
     }
+
+    protected function resolveRecord(int|string $key): \App\Models\Ticket
+    {
+        return \App\Models\Ticket::with('cliente', 'tecnico')->findOrFail($key);
+    }
 }

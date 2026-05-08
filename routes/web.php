@@ -7,6 +7,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/login', function () {
+    return redirect()->route('filament.admin.auth.login');
+})->name('login');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/tecnico', [TecnicoController::class, 'dashboard'])->name('tecnico.dashboard');
     Route::post('/tecnico/ticket/{id}/status', [TecnicoController::class, 'updateStatus'])->name('tecnico.ticket.status');

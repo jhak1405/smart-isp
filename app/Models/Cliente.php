@@ -16,6 +16,7 @@ class Cliente extends Model
         'dni_ruc',
         'telefono',
         'direccion_escrita',
+        'foto_fachada',
         'latitud',
         'longitud',
         'estado',

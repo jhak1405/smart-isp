@@ -594,12 +594,39 @@
                             <form action="{{ route('tecnico.ticket.resolver', $ticket->id) }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm({{ $ticket->id }})">
                                 @csrf
 
+                                <!-- 1. Foto de Fachada del Cliente -->
                                 <div class="form-group">
-                                    <label class="form-label">Evidencia Fotográfica *</label>
+                                    @if($ticket->cliente && $ticket->cliente->foto_fachada)
+                                        <label class="form-label">Fachada del Cliente Registrada</label>
+                                        <div style="margin-bottom: 1rem; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); background: #f8fafc; cursor: zoom-in;"
+                                             onclick="openLightbox('{{ Storage::url($ticket->cliente->foto_fachada) }}')">
+                                            <img src="{{ Storage::url($ticket->cliente->foto_fachada) }}"
+                                                 alt="Fachada del cliente"
+                                                 style="width: 100%; height: auto; max-height: 400px; object-fit: contain; display: block;">
+                                            <div style="background: var(--bg-card); padding: 8px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+                                                📷 Toca la foto para ampliar
+                                            </div>
+                                        </div>
+                                    @else
+                                        <label class="form-label" style="color: var(--danger);">Foto de Fachada del Cliente *</label>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">Este cliente es nuevo o no tiene fachada. Por favor tómale una foto a la casa.</div>
+                                        <div class="file-upload">
+                                            <div class="file-upload-label" id="file-fachada-label-{{ $ticket->id }}">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18"></path></svg>
+                                                <span>Tomar foto de la fachada</span>
+                                            </div>
+                                            <input type="file" name="foto_fachada" accept="image/*" capture="environment" required onchange="updateFachadaName(this, {{ $ticket->id }})">
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- 2. Evidencia del Trabajo -->
+                                <div class="form-group">
+                                    <label class="form-label">Evidencia del Trabajo Realizado *</label>
                                     <div class="file-upload">
                                         <div class="file-upload-label" id="file-label-{{ $ticket->id }}">
-                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                            <span>Pulsa para tomar foto o elegir archivo</span>
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            <span>Pulsa para tomar foto del equipo/trabajo</span>
                                         </div>
                                         <input type="file" name="evidencia" accept="image/*" capture="environment" required onchange="updateFileName(this, {{ $ticket->id }})">
                                     </div>
@@ -657,6 +684,18 @@
                 label.innerHTML = `
                     <svg style="width:32px;height:32px;color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span style="color:#059669;font-weight:600;">Evidencia lista (${(input.files[0].size / 1024 / 1024).toFixed(2)} MB)</span>
+                `;
+                label.style.borderColor = '#10b981';
+                label.style.background = '#ecfdf5';
+            }
+        }
+
+        function updateFachadaName(input, ticketId) {
+            const label = document.getElementById('file-fachada-label-' + ticketId);
+            if (input.files && input.files.length > 0) {
+                label.innerHTML = `
+                    <svg style="width:32px;height:32px;color:#10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span style="color:#059669;font-weight:600;">Fachada lista (${(input.files[0].size / 1024 / 1024).toFixed(2)} MB)</span>
                 `;
                 label.style.borderColor = '#10b981';
                 label.style.background = '#ecfdf5';
@@ -741,4 +780,31 @@
         }
     </script>
 </body>
+
+{{-- Lightbox para ver la foto de fachada a pantalla completa --}}
+<div id="lightbox-overlay"
+     onclick="closeLightbox()"
+     style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92);
+            justify-content:center; align-items:center; flex-direction:column; cursor:zoom-out;">
+    <img id="lightbox-img" src="" alt="Foto ampliada"
+         style="max-width:95vw; max-height:88vh; object-fit:contain; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,0.6);">
+    <p style="color:#aaa; font-size:0.8rem; margin-top:12px;">Toca en cualquier lugar para cerrar</p>
+</div>
+
+<script>
+    function openLightbox(url) {
+        document.getElementById('lightbox-img').src = url;
+        const overlay = document.getElementById('lightbox-overlay');
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+        document.getElementById('lightbox-overlay').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    // Cerrar también con la tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeLightbox();
+    });
+</script>
 </html>

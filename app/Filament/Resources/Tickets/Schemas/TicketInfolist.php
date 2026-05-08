@@ -132,12 +132,18 @@ class TicketInfolist
                                 ->placeholder('Sin notas registradas.')
                                 ->columnSpanFull(),
 
-                            ImageEntry::make('evidencia')
+                            \Filament\Forms\Components\Placeholder::make('evidencia_foto')
                                 ->label('Evidencia Fotográfica')
-                                ->disk('public')
-                                ->visibility('public')
-                                ->height(200)
-                                ->columnSpanFull(),
+                                ->columnSpanFull()
+                                ->content(function ($record) {
+                                    if (blank($record?->evidencia)) {
+                                        return new \Illuminate\Support\HtmlString('<p style="color:#6b7280;font-size:0.875rem;">Sin evidencia registrada.</p>');
+                                    }
+                                    $url = \Illuminate\Support\Facades\Storage::disk('public')->url($record->evidencia);
+                                    return new \Illuminate\Support\HtmlString(
+                                        '<a href="' . $url . '" target="_blank"><img src="' . $url . '" style="max-height:220px;width:100%;object-fit:cover;border-radius:8px;border:1px solid #374151;" alt="Evidencia"></a>'
+                                    );
+                                }),
                         ]),
                 ])->columnSpan(2),
 
