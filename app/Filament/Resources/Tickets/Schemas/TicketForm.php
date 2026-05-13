@@ -5,8 +5,9 @@ namespace App\Filament\Resources\Tickets\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -16,151 +17,97 @@ class TicketForm
     {
         $isTecnico = auth()->user()->role === 'Técnico';
 
-        return $schema
-            ->components([
-                Select::make('cliente_id')
-                    ->label('Cliente')
-                    ->relationship('cliente', 'nombre_completo')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->disabled($isTecnico),
+        return $schema->components([
 
-                \Filament\Forms\Components\Placeholder::make('cliente_info')
-                    ->label('Datos del Cliente')
-                    ->hidden(fn (string $operation): bool => $operation === 'create')
-                    ->content(function ($record) {
-                        if (!$record || !$record->cliente) return '—';
-                        return 'Dirección: ' . ($record->cliente->direccion_escrita ?: 'No registrada') . 
-                               ' | Teléfono: ' . ($record->cliente->telefono ?: 'No registrado');
-                    })
-                    ->columnSpanFull(),
+            // ── Sección 1: Asignación ──────────────────────────────────
+            Section::make('Asignación')
+                ->icon('heroicon-o-user-group')
+                ->columns(2)
+                ->schema([
+                    Select::make('cliente_id')
+                        ->label('Cliente')
+                        ->relationship('cliente', 'nombre_completo')
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->disabled($isTecnico)
+                        ->columnSpanFull(),
 
-                Select::make('user_id')
-                    ->label('Técnico Asignado')
-                    ->relationship('tecnico', 'name', fn(Builder $query) => $query->where('role', 'Técnico'))
-                    ->nullable()
-                    ->searchable()
-                    ->preload()
-                    ->disabled($isTecnico),
+                    // Info de dirección/teléfono del cliente seleccionado
+                    Placeholder::make('cliente_info')
+                        ->label('Referencia del Cliente')
+                        ->hidden(fn (string $operation): bool => $operation === 'create')
+                        ->content(function ($record) {
+                            if (!$record || !$record->cliente) return '—';
+                            $dir = $record->cliente->direccion_escrita ?: 'Sin dirección';
+                            $tel = $record->cliente->telefono ?: 'Sin teléfono';
+                            return new \Illuminate\Support\HtmlString(
+                                '<div style="font-size:0.85rem;line-height:1.7;">' .
+                                '<strong>📍 Dirección:</strong> ' . e($dir) . '<br>' .
+                                '<strong>📞 Teléfono:</strong> ' . e($tel) .
+                                '</div>'
+                            );
+                        })
+                        ->columnSpanFull(),
 
-                TextInput::make('titulo')
-                    ->label('Título')
-                    ->required()
-                    ->minLength(5)
-                    ->maxLength(255)
-                    ->columnSpanFull()
-                    ->disabled($isTecnico),
+                    Select::make('user_id')
+                        ->label('Técnico Asignado')
+                        ->relationship('tecnico', 'name', fn (Builder $query) => $query->where('role', 'Técnico'))
+                        ->nullable()
+                        ->searchable()
+                        ->preload()
+                        ->disabled($isTecnico)
+                        ->columnSpanFull(),
+                ]),
 
-                Textarea::make('descripcion')
-                    ->label('Descripción')
-                    ->required()
-                    ->minLength(10)
-                    ->columnSpanFull()
-                    ->disabled($isTecnico),
+            // ── Sección 2: Detalle del Ticket ─────────────────────────
+            Section::make('Detalle del Ticket')
+                ->icon('heroicon-o-document-text')
+                ->columns(2)
+                ->schema([
+                    TextInput::make('titulo')
+                        ->label('Título')
+                        ->required()
+                        ->minLength(5)
+                        ->maxLength(255)
+                        ->disabled($isTecnico)
+                        ->columnSpanFull(),
 
-                Textarea::make('notas_equipamiento')
-                    ->label('Notas de Equipamiento')
-                    ->helperText('Indica qué materiales o herramientas deberá llevar el técnico al visitar al cliente.')
-                    ->rows(2)
-                    ->placeholder('Ej: Llevar cable RJ45 cat6, router TP-Link, escalera...')
-                    ->columnSpanFull()
-                    ->disabled($isTecnico),
+                    Textarea::make('descripcion')
+                        ->label('Descripción del Problema')
+                        ->required()
+                        ->minLength(10)
+                        ->rows(4)
+                        ->disabled($isTecnico)
+                        ->columnSpanFull(),
+                ]),
 
-                Select::make('estado')
-                    ->label('Estado')
-                    ->required()
-                    ->options([
-                        'Abierto'    => 'Abierto',
-                        'En Proceso' => 'En Proceso',
-                        'Resuelto'   => 'Resuelto',
-                        'Cerrado'    => 'Cerrado',
-                    ])
-                    ->default('Abierto')
-                    ->native(false),
+            // ── Sección 3: Gestión Operativa ──────────────────────────
+            Section::make('Gestión Operativa')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->columns(2)
+                ->schema([
+                    Select::make('estado')
+                        ->label('Estado del Ticket')
+                        ->required()
+                        ->options([
+                            'Abierto'    => 'Abierto',
+                            'En Proceso' => 'En Proceso',
+                            'Resuelto'   => 'Resuelto',
+                            'Cerrado'    => 'Cerrado',
+                        ])
+                        ->default('Abierto')
+                        ->native(false),
 
-                // -------------------------------------------------------
-                // Clasificación de IA (Solo lectura)
-                // -------------------------------------------------------
-                Section::make('Clasificación de Inteligencia Artificial')
-                    ->description('Estos campos son generados automáticamente por el motor de IA (Gemini). No se pueden editar manualmente.')
-                    ->icon('heroicon-o-sparkles')
-                    ->columns(2)
-                    ->collapsed()
-                    ->hidden(fn (string $operation): bool => $operation === 'create')
-                    ->schema([
-                        TextInput::make('ia_prioridad')
-                            ->label('Prioridad (IA)')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->placeholder('Pendiente de análisis'),
+                    Textarea::make('notas_equipamiento')
+                        ->label('⚠️ Notas de Equipamiento')
+                        ->helperText('Indica qué materiales debe llevar el técnico.')
+                        ->rows(2)
+                        ->placeholder('Ej: Cable RJ45 cat6, router TP-Link, escalera...')
+                        ->disabled($isTecnico)
+                        ->columnSpanFull(),
+                ]),
 
-                        TextInput::make('ia_categoria')
-                            ->label('Categoría (IA)')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->placeholder('Pendiente de análisis'),
-
-                        Textarea::make('ia_resumen')
-                            ->label('Resumen (IA)')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->rows(3)
-                            ->placeholder('El resumen generado por la IA aparecerá aquí.')
-                            ->columnSpanFull(),
-                    ]),
-
-                // -------------------------------------------------------
-                // Resolución de Campo (Para el Técnico)
-                // -------------------------------------------------------
-                Section::make('Resolución en Campo')
-                    ->description('Evidencia y notas del trabajo realizado.')
-                    ->icon('heroicon-o-wrench-screwdriver')
-                    ->hidden(fn (string $operation): bool => $operation === 'create')
-                    ->schema([
-                        Textarea::make('nota_tecnico')
-                            ->label('Nota del Técnico')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                        
-                        FileUpload::make('evidencia')
-                            ->label('Evidencia Fotográfica')
-                            ->image()
-                            ->disk('public')
-                            ->directory('evidencias-tickets')
-                            ->columnSpanFull(),
-
-                        \Dotswan\MapPicker\Fields\Map::make('ubicacion_gps')
-                            ->label('Ubicación del Técnico (GPS)')
-                            ->columnSpanFull()
-                            ->defaultLocation(latitude: -5.19449, longitude: -80.63282) // Centro de Piura
-                            ->showMarker()
-                            ->showFullscreenControl()
-                            ->showZoomControl()
-                            ->showMyLocationButton()
-                            ->draggable()
-                            ->clickable(true)
-                            ->afterStateUpdated(function ($set, ?array $state): void {
-                                if (isset($state['lat']) && isset($state['lng'])) {
-                                    // Forzar formato con punto en lugar de coma para evitar errores de BD que mandan al océano (0,0)
-                                    $lat = str_replace(',', '.', (string) $state['lat']);
-                                    $lng = str_replace(',', '.', (string) $state['lng']);
-                                    $set('latitud_capturada', $lat);
-                                    $set('longitud_capturada', $lng);
-                                }
-                            })
-                            ->afterStateHydrated(function ($get, $set, $record): void {
-                                if ($record && $record->latitud_capturada && $record->longitud_capturada) {
-                                    $set('ubicacion_gps', ['lat' => $record->latitud_capturada, 'lng' => $record->longitud_capturada]);
-                                }
-                            })
-                            ->live(onBlur: true)
-                            ->dehydrated(false),
-                        
-                        // Campos invisibles reales que guardan en la BD
-                        \Filament\Forms\Components\Hidden::make('latitud_capturada'),
-                        \Filament\Forms\Components\Hidden::make('longitud_capturada'),
-                    ]),
-            ]);
+        ]);
     }
 }
