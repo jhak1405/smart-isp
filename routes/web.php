@@ -19,4 +19,5 @@ Route::middleware(['auth', 'role:Tecnico'])->group(function () {
     Route::post('/tecnico/ticket/{id}/resolver', [TecnicoController::class, 'resolver'])->name('tecnico.ticket.resolver');
     Route::post('/tecnico/notifications/read', [TecnicoController::class, 'markNotificationsAsRead'])->name('tecnico.notifications.read');
     Route::get('/tecnico/notifications', [TecnicoController::class, 'getNotifications'])->name('tecnico.notifications.get');
+    Route::post('/tecnico/pendiente/{id}/completar', [TecnicoController::class, 'completarPendiente'])->name('tecnico.pendiente.completar');
 });

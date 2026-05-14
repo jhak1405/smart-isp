@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ticket;
+use App\Models\Pendiente;
 use App\Jobs\BroadcastTicketResolved;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +21,14 @@ class TecnicoController extends Controller
         // Obtener notificaciones sin leer del técnico actual
         $notifications = Auth::user()->notifications()->whereNull('read_at')->latest()->limit(5)->get();
 
-        return view('tecnico.dashboard', compact('tickets', 'notifications'));
+        // Pendientes asignados al técnico (solo los no completados), ordenados por fecha
+        $pendientes = Pendiente::with('cliente')
+            ->where('user_id', Auth::id())
+            ->where('estado', 'Pendiente')
+            ->orderBy('fecha_recordatorio', 'asc')
+            ->get();
+
+        return view('tecnico.dashboard', compact('tickets', 'notifications', 'pendientes'));
     }
 
     public function getNotifications()
@@ -43,11 +51,11 @@ class TecnicoController extends Controller
     {
         \Illuminate\Support\Facades\Log::info("Intentando resolver ticket ID: " . $id);
         $request->validate([
-            'latitud' => 'nullable|numeric',
-            'longitud' => 'nullable|numeric',
-            'evidencia' => 'required|image|max:10240', // Siempre requerida para el ticket
-            'foto_fachada' => 'nullable|image|max:10240', // Requerida solo si el cliente no tiene
-            'nota_tecnico' => 'nullable|string'
+            'latitud'      => 'nullable|numeric',
+            'longitud'     => 'nullable|numeric',
+            'evidencia'    => 'required|image|max:10240',
+            'foto_fachada' => 'nullable|image|max:10240',
+            'nota_tecnico' => 'nullable|string',
         ]);
 
         $ticket = Ticket::with('cliente')->where('user_id', Auth::id())->findOrFail($id);
@@ -64,15 +72,15 @@ class TecnicoController extends Controller
             $ticket->cliente->foto_fachada = $pathFachada;
         }
 
-        $ticket->estado = 'Resuelto';
+        $ticket->estado            = 'Resuelto';
         $ticket->latitud_capturada = $request->latitud;
         $ticket->longitud_capturada = $request->longitud;
-        $ticket->nota_tecnico = $request->nota_tecnico;
+        $ticket->nota_tecnico      = $request->nota_tecnico;
         $ticket->save();
 
         // Actualizar coordenadas en el cliente si fueron provistas
         if ($ticket->cliente && $request->latitud && $request->longitud) {
-            $ticket->cliente->latitud = $request->latitud;
+            $ticket->cliente->latitud  = $request->latitud;
             $ticket->cliente->longitud = $request->longitud;
             $ticket->cliente->save();
         }
@@ -81,12 +89,23 @@ class TecnicoController extends Controller
     }
 
     /**
-     * Marcar notificaciones como leídas (para el tecnico)
+     * Marcar notificaciones como leídas (para el técnico)
      */
     public function markNotificationsAsRead()
     {
         Auth::user()->notifications()->whereNull('read_at')->update(['read_at' => now()]);
-
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Marcar un pendiente como completado desde el dashboard del técnico.
+     */
+    public function completarPendiente(Request $request, $id)
+    {
+        $pendiente = Pendiente::where('user_id', Auth::id())->findOrFail($id);
+        $pendiente->estado = 'Completado';
+        $pendiente->save();
+
+        return redirect()->route('tecnico.dashboard')->with('success', 'Pendiente marcado como completado.');
     }
 }

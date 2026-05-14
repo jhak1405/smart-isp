@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -191,8 +193,15 @@
             white-space: nowrap;
         }
 
-        .badge.abierto { background: var(--primary-light); color: var(--primary); }
-        .badge.proceso { background: var(--warning-bg); color: #d97706; }
+        .badge.abierto {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .badge.proceso {
+            background: var(--warning-bg);
+            color: #d97706;
+        }
 
         .ticket-desc {
             font-size: 0.95rem;
@@ -305,8 +314,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .form-group {
@@ -458,22 +474,32 @@
             align-items: center;
             gap: 8px;
         }
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </style>
 </head>
+
 <body>
 
     <header>
         <div class="header-title">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
+                </path>
+            </svg>
             Smart ISP Tech
         </div>
         <div style="display: flex; align-items: center; gap: 1rem;">
             @include('components.notification-bell')
             <form method="POST" action="/admin/logout" style="display:inline;">
                 @csrf
-                <button type="submit" class="logout-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;">
-                    <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <button type="submit" class="logout-btn"
+                    style="background:none;border:none;cursor:pointer;font-family:inherit;">
+                    <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                        </path>
+                    </svg>
                     Salir
                 </button>
             </form>
@@ -483,7 +509,8 @@
     <div class="container">
         <div class="page-header">
             <h1 class="page-title">Tickets Asignados</h1>
-            <span class="ticket-count">{{ $tickets->count() }} {{ $tickets->count() == 1 ? 'Pendiente' : 'Pendientes' }}</span>
+            <span class="ticket-count">{{ $tickets->count() }}
+                {{ $tickets->count() == 1 ? 'Pendiente' : 'Pendientes' }}</span>
         </div>
 
         @if($errors->any())
@@ -498,14 +525,21 @@
 
         @if(session('success'))
             <div class="alert">
-                <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 {{ session('success') }}
             </div>
         @endif
 
         @if($tickets->isEmpty())
             <div class="empty-state">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                    </path>
+                </svg>
                 <h3>Estás al día</h3>
                 <p>No tienes tickets pendientes en tu bandeja por ahora.</p>
             </div>
@@ -516,14 +550,21 @@
                         <div>
                             <h2 class="ticket-title">#{{ $ticket->id }} - {{ $ticket->titulo }}</h2>
                             <div class="ticket-client">
-                                <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
                                 {{ $ticket->cliente ? $ticket->cliente->nombre_completo : 'Cliente Desconocido' }}
                                 @if($ticket->cliente && $ticket->cliente->direccion_escrita)
                                     • {{ $ticket->cliente->direccion_escrita }}
                                 @endif
                             </div>
                         </div>
-                        <span class="badge {{ $ticket->estado == 'Abierto' ? 'abierto' : 'proceso' }}">{{ $ticket->estado }}</span>
+                        <span
+                            class="badge {{ $ticket->estado == 'Abierto' ? 'abierto' : 'proceso' }}">{{ $ticket->estado }}</span>
                     </div>
 
                     <div class="ticket-desc">
@@ -532,23 +573,27 @@
 
                     @if($ticket->notas_equipamiento)
                         <div style="
-                            background: #fffbeb;
-                            border: 1px solid #fcd34d;
-                            border-left: 4px solid #f59e0b;
-                            border-radius: 8px;
-                            padding: 0.875rem 1rem;
-                            margin-bottom: 1.25rem;
-                            display: flex;
-                            gap: 10px;
-                            align-items: flex-start;
-                        ">
+                                        background: #fffbeb;
+                                        border: 1px solid #fcd34d;
+                                        border-left: 4px solid #f59e0b;
+                                        border-radius: 8px;
+                                        padding: 0.875rem 1rem;
+                                        margin-bottom: 1.25rem;
+                                        display: flex;
+                                        gap: 10px;
+                                        align-items: flex-start;
+                                    ">
                             <div style="flex-shrink: 0; margin-top: 2px;">
-                                <svg style="width:18px;height:18px;color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"></path>
+                                <svg style="width:18px;height:18px;color:#d97706;" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z">
+                                    </path>
                                 </svg>
                             </div>
                             <div style="flex: 1;">
-                                <div style="font-size:0.8rem;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">
+                                <div
+                                    style="font-size:0.8rem;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">
                                     ⚠️ Equipamiento Necesario — Llevar Antes de Salir
                                 </div>
                                 <div style="font-size:0.9rem;color:#78350f;line-height:1.5;">
@@ -561,12 +606,16 @@
                     @if($ticket->ia_resumen || $ticket->ia_categoria)
                         <div class="ia-box">
                             <div class="ia-icon">
-                                <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
                             </div>
                             <div class="ia-content">
                                 <div class="ia-title">
                                     <span>Análisis IA: {{ $ticket->ia_categoria }}</span>
-                                    <span style="color: {{ $ticket->ia_prioridad == 'Alta' ? 'var(--danger)' : ($ticket->ia_prioridad == 'Media' ? 'var(--warning)' : 'var(--success)') }}">
+                                    <span
+                                        style="color: {{ $ticket->ia_prioridad == 'Alta' ? 'var(--danger)' : ($ticket->ia_prioridad == 'Media' ? 'var(--warning)' : 'var(--success)') }}">
                                         Prioridad {{ $ticket->ia_prioridad }}
                                     </span>
                                 </div>
@@ -579,19 +628,28 @@
                         <form action="{{ route('tecnico.ticket.status', $ticket->id) }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-outline">
-                                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 Iniciar Trabajo
                             </button>
                         </form>
                     @elseif($ticket->estado === 'En Proceso')
                         <button type="button" class="btn btn-primary" onclick="toggleResolveForm({{ $ticket->id }})">
-                            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                             Resolver Ticket
                         </button>
 
                         <!-- Formulario de Resolución -->
                         <div id="resolve-form-{{ $ticket->id }}" class="resolution-form">
-                            <form action="{{ route('tecnico.ticket.resolver', $ticket->id) }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm({{ $ticket->id }})">
+                            <form action="{{ route('tecnico.ticket.resolver', $ticket->id) }}" method="POST"
+                                enctype="multipart/form-data" onsubmit="return validateForm({{ $ticket->id }})">
                                 @csrf
 
                                 <!-- 1. Foto de Fachada del Cliente -->
@@ -599,23 +657,31 @@
                                     @if($ticket->cliente && $ticket->cliente->foto_fachada)
                                         <label class="form-label">Fachada del Cliente Registrada</label>
                                         <div style="margin-bottom: 1rem; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); background: #f8fafc; cursor: zoom-in;"
-                                             onclick="openLightbox('{{ Storage::url($ticket->cliente->foto_fachada) }}')">
-                                            <img src="{{ Storage::url($ticket->cliente->foto_fachada) }}"
-                                                 alt="Fachada del cliente"
-                                                 style="width: 100%; height: auto; max-height: 400px; object-fit: contain; display: block;">
-                                            <div style="background: var(--bg-card); padding: 8px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+                                            onclick="openLightbox('{{ Storage::url($ticket->cliente->foto_fachada) }}')">
+                                            <img src="{{ Storage::url($ticket->cliente->foto_fachada) }}" alt="Fachada del cliente"
+                                                style="width: 100%; height: auto; max-height: 400px; object-fit: contain; display: block;">
+                                            <div
+                                                style="background: var(--bg-card); padding: 8px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
                                                 📷 Toca la foto para ampliar
                                             </div>
                                         </div>
                                     @else
                                         <label class="form-label" style="color: var(--danger);">Foto de Fachada del Cliente *</label>
-                                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">Este cliente es nuevo o no tiene fachada. Por favor tómale una foto a la casa.</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">Este cliente
+                                            es nuevo o no tiene fachada. Por favor tómale una foto a la casa.</div>
                                         <div class="file-upload">
                                             <div class="file-upload-label" id="file-fachada-label-{{ $ticket->id }}">
-                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18"></path></svg>
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                                                    </path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18">
+                                                    </path>
+                                                </svg>
                                                 <span>Tomar foto de la fachada</span>
                                             </div>
-                                            <input type="file" name="foto_fachada" accept="image/*" capture="environment" required onchange="updateFachadaName(this, {{ $ticket->id }})">
+                                            <input type="file" name="foto_fachada" accept="image/*" capture="environment" required
+                                                onchange="updateFachadaName(this, {{ $ticket->id }})">
                                         </div>
                                     @endif
                                 </div>
@@ -625,23 +691,33 @@
                                     <label class="form-label">Evidencia del Trabajo Realizado *</label>
                                     <div class="file-upload">
                                         <div class="file-upload-label" id="file-label-{{ $ticket->id }}">
-                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
                                             <span>Pulsa para tomar foto del equipo/trabajo</span>
                                         </div>
-                                        <input type="file" name="evidencia" accept="image/*" capture="environment" required onchange="updateFileName(this, {{ $ticket->id }})">
+                                        <input type="file" name="evidencia" accept="image/*" capture="environment" required
+                                            onchange="updateFileName(this, {{ $ticket->id }})">
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label">Nota del Trabajo (Opcional)</label>
-                                    <textarea name="nota_tecnico" class="form-control" rows="3" placeholder="Describe brevemente la solución aplicada..."></textarea>
+                                    <textarea name="nota_tecnico" class="form-control" rows="3"
+                                        placeholder="Describe brevemente la solución aplicada..."></textarea>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label">Ubicación GPS *</label>
                                     <div id="map-{{ $ticket->id }}" class="map-container"></div>
                                     <div id="gps-status-{{ $ticket->id }}" class="gps-status">
-                                        <svg style="width:16px;height:16px;animation: spin 2s linear infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        <svg style="width:16px;height:16px;animation: spin 2s linear infinite;" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                            </path>
+                                        </svg>
                                         Buscando señal GPS para validar trabajo...
                                     </div>
                                     <input type="hidden" name="latitud" id="lat-{{ $ticket->id }}">
@@ -659,8 +735,111 @@
         @endif
     </div>
 
+    {{-- ============================================================ --}}
+    {{-- SECCIÓN: PENDIENTES --}}
+    {{-- ============================================================ --}}
+    <div style="max-width:900px; margin:2rem auto 0; padding:0 1rem;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+            <svg style="width:22px;height:22px;color:#f59e0b;flex-shrink:0;" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            <h2 style="font-size:1.2rem;font-weight:700;color:var(--text-main);margin:0;">
+                Mis Pendientes
+            </h2>
+            @if($pendientes->isNotEmpty())
+                <span
+                    style="background:#fef3c7;color:#92400e;font-size:0.75rem;font-weight:600;padding:2px 10px;border-radius:999px;">
+                    {{ $pendientes->count() }} pendiente{{ $pendientes->count() > 1 ? 's' : '' }}
+                </span>
+            @endif
+        </div>
+
+        @if($pendientes->isEmpty())
+            <div
+                style="background:var(--bg-card);border:1px dashed var(--border-color);border-radius:12px;padding:2rem;text-align:center;color:var(--text-muted);">
+                <svg style="width:36px;height:36px;margin:0 auto 0.5rem;display:block;opacity:0.4;" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p style="font-size:0.9rem;margin:0;">No tienes pendientes asignados por ahora.</p>
+            </div>
+        @else
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                @foreach($pendientes as $pendiente)
+                    @php
+                        $fechaHoy = now()->startOfDay();
+                        $fechaPend = $pendiente->fecha_recordatorio;
+                        $esVencido = $fechaPend->lt($fechaHoy);
+                        $esHoy = $fechaPend->isToday();
+
+                        $borderColor = $esVencido ? '#ef4444' : ($esHoy ? '#f59e0b' : '#e2e8f0');
+                        $badgeBg = $esVencido ? '#fee2e2' : ($esHoy ? '#fef3c7' : '#f1f5f9');
+                        $badgeColor = $esVencido ? '#991b1b' : ($esHoy ? '#92400e' : '#475569');
+                        $badgeText = $esVencido ? 'Vencido' : ($esHoy ? 'Hoy' : $fechaPend->translatedFormat('d M Y'));
+                    @endphp
+
+                    <div
+                        style="background:var(--bg-card);border:1px solid {{ $borderColor }};border-left:4px solid {{ $borderColor }};border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+
+                        {{-- Ícono genérico --}}
+                        <div style="flex-shrink:0;margin-top:2px;">
+                            <svg style="width:20px;height:20px;color:#64748b;" fill="none" stroke="currentColor"
+                                stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                        </div>
+
+                        {{-- Contenido --}}
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+                                <span
+                                    style="font-weight:600;font-size:0.95rem;color:var(--text-main);">
+                                    {{ $pendiente->cliente ? $pendiente->cliente->nombre_completo : 'Cliente no asignado' }}
+                                </span>
+                                @if($pendiente->tipo)
+                                    <span
+                                        style="background:#f1f5f9;color:#475569;font-size:0.72rem;font-weight:600;padding:1px 8px;border-radius:999px;">{{ $pendiente->tipo }}</span>
+                                @endif
+                                <span
+                                    style="background:{{ $badgeBg }};color:{{ $badgeColor }};font-size:0.72rem;font-weight:600;padding:1px 8px;border-radius:999px;">{{ $badgeText }}</span>
+                            </div>
+
+                            @if($pendiente->descripcion)
+                                <p style="font-size:0.83rem;color:var(--text-secondary);margin:0 0 4px;">
+                                    {{ $pendiente->descripcion }}</p>
+                            @endif
+
+                            <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.8rem;color:var(--text-muted);">
+                                @if($pendiente->cliente && $pendiente->cliente->direccion_escrita)
+                                    <span>📍 {{ $pendiente->cliente->direccion_escrita }}</span>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- Botón Completar --}}
+                        <form method="POST" action="{{ route('tecnico.pendiente.completar', $pendiente->id) }}"
+                            style="flex-shrink:0;">
+                            @csrf
+                            <button type="submit"
+                                style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:8px;padding:6px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background 0.2s;"
+                                onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'"
+                                onclick="return confirm('¿Marcar este pendiente como completado?')">
+                                Completar
+                            </button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
         // Animations
@@ -719,7 +898,7 @@
             let marker = null;
 
             if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(function(position) {
+                navigator.geolocation.getCurrentPosition(function (position) {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
                     const accuracy = position.coords.accuracy;
@@ -745,7 +924,7 @@
 
                     document.getElementById('submit-btn-' + ticketId).disabled = false;
 
-                }, function(error) {
+                }, function (error) {
                     const statusEl = document.getElementById('gps-status-' + ticketId);
                     statusEl.innerHTML = `
                         <svg style="width:16px;height:16px;color:#ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -782,12 +961,10 @@
 </body>
 
 {{-- Lightbox para ver la foto de fachada a pantalla completa --}}
-<div id="lightbox-overlay"
-     onclick="closeLightbox()"
-     style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92);
+<div id="lightbox-overlay" onclick="closeLightbox()" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92);
             justify-content:center; align-items:center; flex-direction:column; cursor:zoom-out;">
     <img id="lightbox-img" src="" alt="Foto ampliada"
-         style="max-width:95vw; max-height:88vh; object-fit:contain; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,0.6);">
+        style="max-width:95vw; max-height:88vh; object-fit:contain; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,0.6);">
     <p style="color:#aaa; font-size:0.8rem; margin-top:12px;">Toca en cualquier lugar para cerrar</p>
 </div>
 
@@ -803,8 +980,9 @@
         document.body.style.overflow = '';
     }
     // Cerrar también con la tecla ESC
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeLightbox();
     });
 </script>
+
 </html>
