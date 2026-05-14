@@ -13,17 +13,15 @@ class CheckRole
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role = 'Tecnico'): Response
+    public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
             return redirect('/login');
         }
 
-        if (auth()->user()->role !== $role) {
-            if (auth()->user()->role === 'Administrador') {
-                return redirect('/admin');
-            }
-            abort(403, 'No tienes permisos para acceder a esta área.');
+        // Los administradores no deben acceder a rutas de técnico
+        if (auth()->user()->role === 'Administrador') {
+            return redirect('/admin');
         }
 
         return $next($request);

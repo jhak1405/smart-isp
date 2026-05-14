@@ -1,18 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\TecnicoLoginController;
 use App\Http\Controllers\TecnicoController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/login', function () {
-    if (auth()->check()) {
-        return auth()->user()->role === 'Administrador' ? redirect('/admin') : redirect('/tecnico');
-    }
-    return redirect()->route('filament.admin.auth.login');
-})->name('login');
+// Login universal (técnicos y administradores)
+Route::get('/login',  [TecnicoLoginController::class, 'showForm'])->name('login');
+Route::post('/login', [TecnicoLoginController::class, 'login'])->name('login.post');
+Route::post('/logout',[TecnicoLoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'role:Tecnico'])->group(function () {
     Route::get('/tecnico', [TecnicoController::class, 'dashboard'])->name('tecnico.dashboard');
