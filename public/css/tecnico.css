@@ -25,10 +25,17 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background-color: var(--bg-body);
     color: var(--text-main);
-    min-height: 100vh;
+    min-height: 100%;
+    width: 100%;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -76,7 +83,7 @@ header {
     padding: 1.25rem 1.25rem;
     max-width: 800px;
     margin: 0 auto;
-    padding-bottom: 80px;
+    padding-bottom: 120px;
 }
 
 /* Cards */
@@ -578,3 +585,12 @@ header {
 .btn-complete:hover {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
+
+/* Priority styles */
+.ticket-card.prioridad-alta { border-left: 4px solid var(--danger); box-shadow: -8px 0 25px -10px rgba(239, 68, 68, 0.6); }
+.ticket-card.prioridad-media { border-left: 4px solid var(--warning); box-shadow: -8px 0 25px -10px rgba(245, 158, 11, 0.5); }
+.ticket-card.prioridad-baja { border-left: 4px solid var(--primary); box-shadow: -8px 0 25px -10px rgba(59, 130, 246, 0.5); }
+
+.badge.badge-alta { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+.badge.badge-media { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+.badge.badge-baja { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }

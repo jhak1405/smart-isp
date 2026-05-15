@@ -97,7 +97,21 @@
             </div>
         @else
             @foreach($tickets as $ticket)
-                <div class="ticket-card {{ $ticket->estado == 'En Proceso' ? 'en-proceso' : 'abierto' }}">
+                @php
+                    $prioClass = 'prioridad-baja';
+                    $badgeClass = 'badge-baja';
+                    $prioLabel = 'BAJO';
+                    if ($ticket->ia_prioridad == 'Alta') {
+                        $prioClass = 'prioridad-alta';
+                        $badgeClass = 'badge-alta';
+                        $prioLabel = 'URGENTE';
+                    } elseif ($ticket->ia_prioridad == 'Media') {
+                        $prioClass = 'prioridad-media';
+                        $badgeClass = 'badge-media';
+                        $prioLabel = 'MEDIO';
+                    }
+                @endphp
+                <div class="ticket-card {{ $prioClass }}">
                     {{-- TOP ROW: Ticket ID & Priority Badge --}}
                     <div class="ticket-top-row">
                         <div class="ticket-id">
@@ -106,8 +120,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <span class="badge {{ $ticket->estado == 'Abierto' ? 'abierto' : 'proceso' }}" >
-                            {{ $ticket->estado == 'Abierto' ? 'URGENTE' : 'EN CURSO' }}
+                        <span class="badge {{ $badgeClass }}">
+                            {{ $prioLabel }}
                         </span>
                     </div>
 
@@ -187,7 +201,12 @@
                             </div>
                         </form>
                     @elseif($ticket->estado === 'En Proceso')
-                        <button type="button" class="btn btn-primary" onclick="toggleResolveForm({{ $ticket->id }})">
+                        @php
+                            $hasGps = $ticket->cliente && $ticket->cliente->latitud && $ticket->cliente->longitud;
+                            $cLat = $hasGps ? $ticket->cliente->latitud : 'null';
+                            $cLng = $hasGps ? $ticket->cliente->longitud : 'null';
+                        @endphp
+                        <button type="button" class="btn btn-primary" onclick="toggleResolveForm({{ $ticket->id }}, {{ $cLat }}, {{ $cLng }})">
                             <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
@@ -259,17 +278,28 @@
                                 <div class="form-group">
                                     <label class="form-label">Ubicación GPS *</label>
                                     <div id="map-{{ $ticket->id }}" class="map-container"></div>
-                                    <div id="gps-status-{{ $ticket->id }}" class="gps-status">
-                                        <svg style="width:16px;height:16px;animation: spin 2s linear infinite;" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                            </path>
-                                        </svg>
-                                        Buscando señal GPS para validar trabajo...
+                                    <div id="gps-status-{{ $ticket->id }}" class="gps-status {{ $hasGps ? 'locked' : '' }}">
+                                        @if($hasGps)
+                                            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            Ubicación del cliente cargada correctamente.
+                                        @else
+                                            <svg style="width:16px;height:16px;animation: spin 2s linear infinite;" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                                </path>
+                                            </svg>
+                                            Buscando señal GPS para validar trabajo...
+                                        @endif
                                     </div>
-                                    <input type="hidden" name="latitud" id="lat-{{ $ticket->id }}">
-                                    <input type="hidden" name="longitud" id="lng-{{ $ticket->id }}">
+                                    @if($hasGps)
+                                    <button type="button" class="btn-outline" style="width:100%; margin-top:8px; padding:0.5rem; font-size:0.85rem; border-radius:8px;" onclick="updateGpsManual({{ $ticket->id }})">
+                                        <svg style="width:14px;height:14px;margin-right:4px;display:inline;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                                        Actualizar a mi ubicación actual (Si se mudó)
+                                    </button>
+                                    @endif
+                                    <input type="hidden" name="latitud" id="lat-{{ $ticket->id }}" value="{{ $hasGps ? $ticket->cliente->latitud : '' }}">
+                                    <input type="hidden" name="longitud" id="lng-{{ $ticket->id }}" value="{{ $hasGps ? $ticket->cliente->longitud : '' }}">
                                 </div>
 
                                 <button type="submit" class="btn btn-success" id="submit-btn-{{ $ticket->id }}" disabled>
@@ -399,13 +429,13 @@
             }
         }
 
-        function toggleResolveForm(ticketId) {
+        function toggleResolveForm(ticketId, lat = null, lng = null) {
             const form = document.getElementById('resolve-form-' + ticketId);
             if (form.style.display === 'block') {
                 form.style.display = 'none';
             } else {
                 form.style.display = 'block';
-                initMap(ticketId);
+                initMap(ticketId, lat, lng);
             }
         }
 
@@ -435,11 +465,14 @@
 
         let maps = {};
 
-        function initMap(ticketId) {
+        function initMap(ticketId, cLat = null, cLng = null) {
             if (maps[ticketId]) return; // Evitar reinicializar
 
             // Crear mapa
-            const map = L.map('map-' + ticketId).setView([-5.19449, -80.63282], 13); // Default Piura
+            let initialLat = cLat !== null ? cLat : -5.19449;
+            let initialLng = cLng !== null ? cLng : -80.63282;
+
+            const map = L.map('map-' + ticketId).setView([initialLat, initialLng], cLat ? 16 : 13);
             maps[ticketId] = map;
 
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -447,7 +480,24 @@
                 attribution: '© OpenStreetMap'
             }).addTo(map);
 
-            let marker = null;
+            if (cLat !== null && cLng !== null) {
+                L.marker([cLat, cLng]).addTo(map).bindPopup("Ubicación Registrada").openPopup();
+                document.getElementById('submit-btn-' + ticketId).disabled = false;
+            } else {
+                updateGpsManual(ticketId);
+            }
+        }
+
+        function updateGpsManual(ticketId) {
+            const map = maps[ticketId];
+            if (!map) return;
+            
+            const statusEl = document.getElementById('gps-status-' + ticketId);
+            statusEl.className = 'gps-status';
+            statusEl.innerHTML = `
+                <svg style="width:16px;height:16px;animation: spin 2s linear infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Buscando señal GPS para validar trabajo...
+            `;
 
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(function (position) {
@@ -457,17 +507,16 @@
 
                     map.setView([lat, lng], 16);
 
-                    if (marker) map.removeLayer(marker);
-
-                    marker = L.marker([lat, lng]).addTo(map)
-                        .bindPopup("Ubicación exacta de trabajo").openPopup();
+                    // clear previous markers if we had them saved, though Leaflet doesn't track them easily without a reference.
+                    // Instead we just add the new one.
+                    L.marker([lat, lng]).addTo(map)
+                        .bindPopup("Tu ubicación actual (Actualizada)").openPopup();
 
                     L.circle([lat, lng], { radius: accuracy, color: '#2563eb', fillOpacity: 0.1 }).addTo(map);
 
                     document.getElementById('lat-' + ticketId).value = lat;
                     document.getElementById('lng-' + ticketId).value = lng;
 
-                    const statusEl = document.getElementById('gps-status-' + ticketId);
                     statusEl.className = 'gps-status locked';
                     statusEl.innerHTML = `
                         <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -477,12 +526,10 @@
                     document.getElementById('submit-btn-' + ticketId).disabled = false;
 
                 }, function (error) {
-                    const statusEl = document.getElementById('gps-status-' + ticketId);
                     statusEl.innerHTML = `
                         <svg style="width:16px;height:16px;color:#ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         <span style="color:#ef4444;">No se pudo verificar tu ubicación. Permite el uso del GPS en el navegador.</span>
                     `;
-                    // Permitir envío aun si falla la geolocalización (se recomienda usar GPS)
                     document.getElementById('submit-btn-' + ticketId).disabled = false;
                 }, {
                     enableHighAccuracy: true,
@@ -490,7 +537,6 @@
                     maximumAge: 0
                 });
             } else {
-                const statusEl = document.getElementById('gps-status-' + ticketId);
                 statusEl.innerHTML = "Navegador incompatible con GPS. Puedes completar sin coordenadas.";
                 document.getElementById('submit-btn-' + ticketId).disabled = false;
             }

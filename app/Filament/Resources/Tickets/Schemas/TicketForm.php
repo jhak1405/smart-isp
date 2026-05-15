@@ -95,7 +95,6 @@ class TicketForm
                 // ── Fila 5: Notas de Equipamiento (col completa) ──────────
                 Textarea::make('notas_equipamiento')
                     ->label('Notas de Equipamiento')
-                    ->helperText('Materiales o herramientas que debe llevar el técnico.')
                     ->rows(2)
                     ->placeholder('Ej: Cable RJ45 cat6, router TP-Link, escalera...')
                     ->disabled($isTecnico)
