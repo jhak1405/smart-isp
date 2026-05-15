@@ -30,7 +30,8 @@ class Login extends FilamentLogin
                 session()->regenerate();
 
                 // Redirect to the technician dashboard
-                return redirect('/tecnico');
+                $this->redirect('/tecnico');
+                return null;
             }
         }
 

@@ -53,7 +53,7 @@ class PendienteResource extends Resource
                 TextInput::make('tipo')
                     ->label('Tipo de Pendiente')
                     ->required()
-                    ->placeholder('Ej: Cambio de router, Verificación de cableado...')
+                    ->placeholder('Ej: Recoger el router, Pago pendiente, etc...')
                     ->columnSpanFull(),
 
                 Select::make('estado')

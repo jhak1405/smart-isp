@@ -8,10 +8,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Login universal (técnicos y administradores)
-Route::get('/login',  [TecnicoLoginController::class, 'showForm'])->name('login');
-Route::post('/login', [TecnicoLoginController::class, 'login'])->name('login.post');
-Route::post('/logout',[TecnicoLoginController::class, 'logout'])->name('logout');
+// Login universal: Redirigimos siempre al login de Filament
+Route::get('/login', function () {
+    return redirect('/admin/login');
+})->name('login');
+
+// Logout universal para técnicos
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/login');
+})->name('logout');
 
 Route::middleware(['auth', 'role:Tecnico'])->group(function () {
     Route::get('/tecnico', [TecnicoController::class, 'dashboard'])->name('tecnico.dashboard');

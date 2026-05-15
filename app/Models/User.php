@@ -34,6 +34,10 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->role === 'Administrador';
+        if ($this->role !== 'Administrador') {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(redirect('/tecnico'));
+        }
+        
+        return true;
     }
 }
