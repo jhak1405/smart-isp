@@ -15,7 +15,7 @@ class TicketForm
 {
     public static function configure(Schema $schema): Schema
     {
-        $isTecnico = auth()->user()->role === 'Técnico';
+        $isTecnico = auth()->user()->hasRole('Técnico');
 
         return $schema
             ->columns(2)

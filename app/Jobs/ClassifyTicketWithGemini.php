@@ -29,10 +29,11 @@ class ClassifyTicketWithGemini implements ShouldQueue
      */
     public function handle(): void
     {
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('services.gemini.api_key');
 
         if (!$apiKey) {
             Log::error('Gemini API Key is missing. Cannot classify ticket.');
+            $this->setFallbackClassification('Falta API Key');
             return;
         }
 
@@ -65,6 +66,7 @@ class ClassifyTicketWithGemini implements ShouldQueue
 
             if ($response->failed()) {
                 Log::error('Gemini API falló irremediablemente: ' . $response->body());
+                $this->setFallbackClassification('Error de API');
                 return;
             }
 
@@ -73,6 +75,7 @@ class ClassifyTicketWithGemini implements ShouldQueue
 
             if (!$aiText) {
                 Log::error('Gemini API no devolvió texto. Respuesta: ' . $response->body());
+                $this->setFallbackClassification('Respuesta vacía');
                 return;
             }
 
@@ -95,5 +98,22 @@ class ClassifyTicketWithGemini implements ShouldQueue
             // Reintentar si falla la conexión
             $this->release(30);
         }
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('El Job de Gemini falló completamente tras los reintentos permitidos: ' . $exception->getMessage());
+        $this->setFallbackClassification('Fallo en triaje IA');
+    }
+
+    private function setFallbackClassification(string $reason): void
+    {
+        $this->ticket->ia_categoria = 'General';
+        $this->ticket->ia_prioridad = 'Media';
+        $this->ticket->ia_resumen = $reason;
+        $this->ticket->saveQuietly();
     }
 }

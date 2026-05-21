@@ -11,13 +11,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * Get the attributes that should be cast.
@@ -34,8 +35,15 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if ($this->role !== 'Administrador') {
+        // En Filament Shield se maneja esto por políticas o roles.
+        // Pero para separar la app web del técnico, si es Técnico lo mandamos a /tecnico
+        if ($this->hasRole('Técnico')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(redirect('/tecnico'));
+        }
+
+        // Si es panel admin, permitimos a todos los demás roles que sí entran a Filament
+        if ($panel->getId() === 'admin') {
+            return $this->hasRole(['Administrador', 'Coordinador de Soporte', 'Personal Administrativo', 'super_admin']);
         }
         
         return true;
