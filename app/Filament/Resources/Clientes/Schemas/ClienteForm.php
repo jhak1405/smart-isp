@@ -72,8 +72,7 @@ class ClienteForm
                             ->minValue(-90)
                             ->maxValue(90)
                             ->step(0.00000001)
-                            ->placeholder('Ej: -12.04318000')
-                            ->helperText('Se completará automáticamente desde el móvil (Sprint 3).'),
+                            ->placeholder('Ej: -12.04318000'),
 
                         TextInput::make('longitud')
                             ->label('Longitud')
@@ -81,8 +80,7 @@ class ClienteForm
                             ->minValue(-180)
                             ->maxValue(180)
                             ->step(0.00000001)
-                            ->placeholder('Ej: -77.02824100')
-                            ->helperText('Se completará automáticamente desde el móvil (Sprint 3).'),
+                            ->placeholder('Ej: -77.02824100'),
                     ]),
             ]);
     }

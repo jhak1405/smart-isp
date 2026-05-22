@@ -24,8 +24,24 @@ class PendienteObserver
     public function updated(Pendiente $pendiente): void
     {
         // Si se cambió el campo user_id y ahora tiene un técnico asignado
-        if ($pendiente->isDirty('user_id') && $pendiente->user_id && $pendiente->tecnico) {
+        if ($pendiente->wasChanged('user_id') && $pendiente->user_id && $pendiente->tecnico) {
             $this->notificarAsignacion($pendiente);
+        }
+
+        // Si el técnico marcó el pendiente como Completado
+        if ($pendiente->wasChanged('estado') && $pendiente->estado === 'Completado') {
+            $admins = \App\Models\User::where('role', 'Administrador')->get();
+            $clienteNombre = $pendiente->cliente ? $pendiente->cliente->nombre_completo : 'un cliente';
+            $tecnicoNombre = $pendiente->tecnico ? $pendiente->tecnico->name : 'Un técnico';
+            
+            foreach ($admins as $admin) {
+                \Filament\Notifications\Notification::make()
+                    ->title("Pendiente Completado")
+                    ->body("El técnico {$tecnicoNombre} ha completado el pendiente de {$clienteNombre}.")
+                    ->icon('heroicon-o-check-circle')
+                    ->iconColor('success')
+                    ->sendToDatabase($admin);
+            }
         }
     }
 
